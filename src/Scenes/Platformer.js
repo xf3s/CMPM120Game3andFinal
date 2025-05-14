@@ -51,6 +51,7 @@ class Platformer extends Phaser.Scene {
 
         ////////////////////
         // TODO: put water bubble particle effect here
+        // It's OK to have it start running
         ////////////////////
 
 
@@ -61,11 +62,15 @@ class Platformer extends Phaser.Scene {
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
+        // TODO: create coin collect particle effect here
+        // Important: make sure it's not running
+
+
         // Coin collision handler
         this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
             ////////////////////
-            // TODO: put coin collect particle effect here
+            // TODO: start the coin collect particle effect here
             ////////////////////
 
         });
