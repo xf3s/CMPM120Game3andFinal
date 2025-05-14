@@ -38,10 +38,6 @@ class Platformer extends Phaser.Scene {
             frame: 151
         });
 
-        for (let coin of this.coins) {
-            coin.setTint(0xff0000);
-        }
-
         this.physics.world.enable(this.coins, Phaser.Physics.Arcade.STATIC_BODY);
 
         // Create a Phaser group out of the array this.coins
