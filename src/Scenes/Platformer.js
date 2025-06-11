@@ -54,6 +54,24 @@ class Platformer extends Phaser.Scene {
         // It's OK to have it start running
         ////////////////////
 
+        this.waterTiles.forEach(tile => {
+            my.vfx.bubbles = this.add.particles(tile.getCenterX(), tile.getCenterY(), 'kenny-particles', {
+                frame: 'circle_01.png',
+                // randomly emit from the area of the tile
+                emitZone: { 
+                    source: new Phaser.Geom.Rectangle(-tile.width/2, -tile.height/2, tile.width, tile.height), 
+                    type: 'random', 
+                    quantity: 1 
+                },
+                speedY: { min: -40, max: -60 },
+                lifespan: { min: 500, max: 1500 },
+                scale: { start: 0.01, end: 0.03 },
+                alpha: { start: 1, end: 0 },
+                frequency: 400,
+                blendMode: 'ADD'
+            });
+        });
+
 
         // set up player avatar
         my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0000.png");
@@ -62,16 +80,21 @@ class Platformer extends Phaser.Scene {
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.groundLayer);
 
-        // TODO: create coin collect particle effect here
-        // Important: make sure it's not running
 
+        my.vfx.coinCollect = this.add.particles(0, 0, 'kenny-particles', {
+            frame: 'star_04.png',
+            lifespan: 600,
+            speed: { min: 150, max: 250 },
+            scale: { start: 0.05, end: 0 },
+            gravityY: 100,
+            blendMode: 'ADD',
+            emitting: false // don't start automatically
+        });
 
         // Coin collision handler
         this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
-            ////////////////////
-            // TODO: start the coin collect particle effect here
-            ////////////////////
+            my.vfx.coinCollect.emitParticle(15, obj2.x, obj2.y);
 
         });
 
@@ -85,8 +108,6 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
-
-        // TODO: Add movement vfx here
         
 
         // Simple camera to follow player
@@ -103,20 +124,17 @@ class Platformer extends Phaser.Scene {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
             my.sprite.player.anims.play('walk', true);
-            // TODO: add particle following code here
 
         } else if(cursors.right.isDown) {
             my.sprite.player.setAccelerationX(this.ACCELERATION);
             my.sprite.player.setFlip(true, false);
             my.sprite.player.anims.play('walk', true);
-            // TODO: add particle following code here
 
         } else {
             // Set acceleration to 0 and have DRAG take over
             my.sprite.player.setAccelerationX(0);
             my.sprite.player.setDragX(this.DRAG);
             my.sprite.player.anims.play('idle');
-            // TODO: have the vfx stop playing
         }
 
         // player jump
