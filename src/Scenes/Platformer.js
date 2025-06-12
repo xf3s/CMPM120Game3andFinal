@@ -5,15 +5,34 @@ class Platformer extends Phaser.Scene {
 
     init() {
         // variables and settings
-        this.ACCELERATION = 400;
-        this.DRAG = 500;    // DRAG < ACCELERATION = icy slide
-        this.physics.world.gravity.y = 1500;
-        this.JUMP_VELOCITY = -600;
+
+        // ---------------
+        // variables and settings
+        // ---------------
+
+        this.ACCELERATION = 800;
+        this.DRAG = 1000;    // DRAG < ACCELERATION = icy slide
+        this.physics.world.gravity.y = 800;
+        this.JUMP_VELOCITY = -300;
+
+        this.MAX_X_VELOCITY = 150;
+        this.MAX_Y_VELOCITY = 400;
+
+
         this.PARTICLE_VELOCITY = 50;
-        this.SCALE = 2.0;
+        this.SCALE = 3.0;
+
+        this.coinCount = 0;
     }
 
     create() {
+        // coin counter
+        this.scene.launch('uiScene');
+
+        // ---------------
+        // level & tilemap
+        // ---------------
+
         // Create a new tilemap game object which uses 18x18 pixel tiles, and is
         // 45 tiles wide and 25 tiles tall.
         this.map = this.add.tilemap("underground_level", 16, 16, 90, 60);
@@ -23,6 +42,9 @@ class Platformer extends Phaser.Scene {
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
         this.tileset = this.map.addTilesetImage("1bitplatformer", "monochrome_tilemap_tiles");
 
+        this.backgroundLayer = this.map.createLayer("background", this.tileset, 0, 0);
+        this.spikeLayer = this.map.createLayer("spikes", this.tileset, 0, 0);
+
         // Create a layer
         this.wallsLayer = this.map.createLayer("walls", this.tileset, 0, 0);
 
@@ -30,6 +52,36 @@ class Platformer extends Phaser.Scene {
         this.wallsLayer.setCollisionByProperty({
             collides: true
         });
+
+        // ---------------
+        // player avatar
+        // ---------------
+       
+        // set up player avatar
+        my.sprite.player = this.physics.add.sprite(20, 750, "platformer_characters", "tile_0000.png");
+        my.sprite.player.setCollideWorldBounds(true);
+
+        my.sprite.player.body.setMaxVelocity(this.MAX_X_VELOCITY, this.MAX_Y_VELOCITY);
+
+        // Enable collision handling
+        this.physics.add.collider(my.sprite.player, this.wallsLayer);
+
+        // ---------------
+        // camera
+        // ---------------
+
+        // Simple camera to follow player
+        this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+        this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
+        this.cameras.main.setDeadzone(50, 50);
+        this.cameras.main.setZoom(this.SCALE);
+
+
+        
+
+        // ---------------
+        // coins
+        // ---------------
 
         // Create coins from Objects layer in tilemap
         this.coins = this.map.createFromObjects("coins", {
@@ -44,48 +96,11 @@ class Platformer extends Phaser.Scene {
         // This will be used for collision detection below.
         this.coinGroup = this.add.group(this.coins);
 
-        // Find water tiles
-        this.waterTiles = this.groundLayer.filterTiles(tile => {
-            return tile.properties.water == true;
-        });
-
-        ////////////////////
-        // TODO: put water bubble particle effect here
-        // It's OK to have it start running
-        ////////////////////
-
-        this.waterTiles.forEach(tile => {
-            my.vfx.bubbles = this.add.particles(tile.getCenterX(), tile.getCenterY(), 'kenny-particles', {
-                frame: 'circle_01.png',
-                // randomly emit from the area of the tile
-                emitZone: { 
-                    source: new Phaser.Geom.Rectangle(-tile.width/2, -tile.height/2, tile.width, tile.height), 
-                    type: 'random', 
-                    quantity: 1 
-                },
-                speedY: { min: -40, max: -60 },
-                lifespan: { min: 500, max: 1500 },
-                scale: { start: 0.01, end: 0.03 },
-                alpha: { start: 1, end: 0 },
-                frequency: 400,
-                blendMode: 'ADD'
-            });
-        });
-
-
-        // set up player avatar
-        my.sprite.player = this.physics.add.sprite(20, 750, "platformer_characters", "tile_0000.png");
-        my.sprite.player.setCollideWorldBounds(true);
-
-        // Enable collision handling
-        this.physics.add.collider(my.sprite.player, this.wallsLayer);
-
-
         my.vfx.coinCollect = this.add.particles(0, 0, 'kenny-particles', {
             frame: 'star_04.png',
-            lifespan: 600,
+            lifespan: 100,
             speed: { min: 150, max: 250 },
-            scale: { start: 0.05, end: 0 },
+            scale: { start: 0.1, end: 0.05 },
             gravityY: 100,
             blendMode: 'ADD',
             emitting: false // don't start automatically
@@ -94,9 +109,18 @@ class Platformer extends Phaser.Scene {
         // Coin collision handler
         this.physics.add.overlap(my.sprite.player, this.coinGroup, (obj1, obj2) => {
             obj2.destroy(); // remove coin on overlap
-            my.vfx.coinCollect.emitParticle(15, obj2.x, obj2.y);
+            my.vfx.coinCollect.emitParticle(8, obj2.x, obj2.y);
 
+            this.coinCount++;
+            this.events.emit('update-score', this.coinCount);
         });
+
+        
+
+
+        // ---------------
+        // key input
+        // ---------------
 
         // set up Phaser-provided cursor key input
         cursors = this.input.keyboard.createCursorKeys();
@@ -108,15 +132,6 @@ class Platformer extends Phaser.Scene {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
             this.physics.world.debugGraphic.clear()
         }, this);
-        
-
-        // Simple camera to follow player
-        this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
-        this.cameras.main.startFollow(my.sprite.player, true, 0.25, 0.25); // (target, [,roundPixels][,lerpX][,lerpY])
-        this.cameras.main.setDeadzone(50, 50);
-        this.cameras.main.setZoom(this.SCALE);
-        
-
     }
 
     update() {
