@@ -831,6 +831,18 @@
                  "width":16,
                  "x":1279.29190703807,
                  "y":146.453931102687
+                }, 
+                {
+                 "gid":3,
+                 "height":16,
+                 "id":64,
+                 "name":"coin",
+                 "rotation":90,
+                 "type":"",
+                 "visible":true,
+                 "width":16,
+                 "x":13.3056076359298,
+                 "y":11.4088972217488
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -839,7 +851,7 @@
          "y":0
         }],
  "nextlayerid":6,
- "nextobjectid":64,
+ "nextobjectid":65,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

@@ -16,12 +16,12 @@ class Platformer extends Phaser.Scene {
     create() {
         // Create a new tilemap game object which uses 18x18 pixel tiles, and is
         // 45 tiles wide and 25 tiles tall.
-        this.map = this.add.tilemap("platformer-level-1", 16, 16, 90, 60);
+        this.map = this.add.tilemap("underground_level", 16, 16, 90, 60);
 
         // Add a tileset to the map
         // First parameter: name we gave the tileset in Tiled
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
-        this.tileset = this.map.addTilesetImage("1bitplatformer", "monochrome_tilemap_sheet");
+        this.tileset = this.map.addTilesetImage("1bitplatformer", "monochrome_tilemap_tiles");
 
         // Create a layer
         this.wallsLayer = this.map.createLayer("walls", this.tileset, 0, 0);
@@ -32,7 +32,7 @@ class Platformer extends Phaser.Scene {
         });
 
         // Create coins from Objects layer in tilemap
-        this.coins = this.map.createFromObjects("Objects", {
+        this.coins = this.map.createFromObjects("coins", {
             name: "coin",
             key: "monochrome_tilemap_sheet",
             frame: 2
@@ -74,11 +74,11 @@ class Platformer extends Phaser.Scene {
 
 
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(30, 345, "platformer_characters", "tile_0000.png");
+        my.sprite.player = this.physics.add.sprite(20, 750, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
 
         // Enable collision handling
-        this.physics.add.collider(my.sprite.player, this.groundLayer);
+        this.physics.add.collider(my.sprite.player, this.wallsLayer);
 
 
         my.vfx.coinCollect = this.add.particles(0, 0, 'kenny-particles', {
