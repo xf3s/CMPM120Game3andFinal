@@ -43,7 +43,12 @@ class Platformer extends Phaser.Scene {
         this.tileset = this.map.addTilesetImage("1bitplatformer", "monochrome_tilemap_tiles");
 
         this.backgroundLayer = this.map.createLayer("background", this.tileset, 0, 0);
+       
         this.spikeLayer = this.map.createLayer("spikes", this.tileset, 0, 0);
+
+        this.spikeLayer.setCollisionByProperty({
+            collides: true
+        });
 
         // Create a layer
         this.wallsLayer = this.map.createLayer("walls", this.tileset, 0, 0);
@@ -65,6 +70,13 @@ class Platformer extends Phaser.Scene {
 
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.wallsLayer);
+
+        this.physics.add.collider(my.sprite.player, this.spikeLayer, () => {
+            // restart the scene on collision with spikes- "death"
+            this.scene.restart();
+        });
+
+        
 
         // ---------------
         // camera

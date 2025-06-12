@@ -6,8 +6,8 @@ class UIScene extends Phaser.Scene {
     create() {
         // Create the score text
         this.scoreText = this.add.text(20, 20, 'Coins: 0', { 
-            fontFamily: 'sans-serif', 
-            fontSize: '20px', 
+            fontFamily: 'monaco', 
+            fontSize: '40px', 
             fill: '#ffffff' 
         });
 
