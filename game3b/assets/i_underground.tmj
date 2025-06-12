@@ -848,7 +848,7 @@
         {
          "columns":20,
          "firstgid":1,
-         "image":"..\/..\/StarterPlatformer\/assets\/monochrome_tilemap_packed.png",
+         "image":"..\/..\/..\/StarterPlatformer\/assets\/monochrome_tilemap_packed.png",
          "imageheight":320,
          "imagewidth":320,
          "margin":0,
@@ -857,6 +857,15 @@
          "tilecount":400,
          "tileheight":16,
          "tiles":[
+                {
+                 "id":122,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
                 {
                  "id":123,
                  "properties":[
@@ -894,6 +903,24 @@
                         }]
                 }, 
                 {
+                 "id":166,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":183,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":195,
                  "properties":[
                         {
@@ -922,6 +949,15 @@
                 }, 
                 {
                  "id":198,
+                 "properties":[
+                        {
+                         "name":"collides",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":203,
                  "properties":[
                         {
                          "name":"collides",

@@ -4,8 +4,6 @@ class Platformer extends Phaser.Scene {
     }
 
     init() {
-        // variables and settings
-
         // ---------------
         // variables and settings
         // ---------------
@@ -23,11 +21,13 @@ class Platformer extends Phaser.Scene {
         this.SCALE = 3.0;
 
         this.coinCount = 0;
+        this.playerIsDead = false;
     }
 
     create() {
         // coin counter
         this.scene.launch('uiScene');
+
 
         // ---------------
         // level & tilemap
@@ -58,12 +58,14 @@ class Platformer extends Phaser.Scene {
             collides: true
         });
 
+        this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+
         // ---------------
         // player avatar
         // ---------------
        
         // set up player avatar
-        my.sprite.player = this.physics.add.sprite(20, 750, "platformer_characters", "tile_0000.png");
+        my.sprite.player = this.physics.add.sprite(20, 755, "platformer_characters", "tile_0000.png");
         my.sprite.player.setCollideWorldBounds(true);
 
         my.sprite.player.body.setMaxVelocity(this.MAX_X_VELOCITY, this.MAX_Y_VELOCITY);
@@ -71,11 +73,22 @@ class Platformer extends Phaser.Scene {
         // Enable collision handling
         this.physics.add.collider(my.sprite.player, this.wallsLayer);
 
-        this.physics.add.collider(my.sprite.player, this.spikeLayer, () => {
-            // restart the scene on collision with spikes- "death"
-            this.scene.restart();
-        });
+        
 
+        // ---------------
+        // spike collision
+        // ---------------
+
+        this.physics.add.collider(my.sprite.player, this.spikeLayer, () => {
+            this.playerIsDead = true;
+            my.sprite.player.setAccelerationX(0);
+            my.sprite.player.setVelocity(0);
+
+            this.events.emit('player-died');
+            this.input.once('pointerdown', () => {
+                this.scene.restart();
+            });
+        });
         
 
         // ---------------
@@ -139,6 +152,8 @@ class Platformer extends Phaser.Scene {
 
         this.rKey = this.input.keyboard.addKey('R');
 
+        
+
         // debug key listener (assigned to D key)
         this.input.keyboard.on('keydown-D', () => {
             this.physics.world.drawDebug = this.physics.world.drawDebug ? false : true
@@ -147,6 +162,13 @@ class Platformer extends Phaser.Scene {
     }
 
     update() {
+        if (this.playerIsDead) {
+            if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
+                this.scene.restart();
+            }
+            return;
+        }
+
         if(cursors.left.isDown) {
             my.sprite.player.setAccelerationX(-this.ACCELERATION);
             my.sprite.player.resetFlip();
