@@ -16,26 +16,26 @@ class Platformer extends Phaser.Scene {
     create() {
         // Create a new tilemap game object which uses 18x18 pixel tiles, and is
         // 45 tiles wide and 25 tiles tall.
-        this.map = this.add.tilemap("platformer-level-1", 18, 18, 45, 25);
+        this.map = this.add.tilemap("platformer-level-1", 16, 16, 90, 60);
 
         // Add a tileset to the map
         // First parameter: name we gave the tileset in Tiled
         // Second parameter: key for the tilesheet (from this.load.image in Load.js)
-        this.tileset = this.map.addTilesetImage("kenny_tilemap_packed", "tilemap_tiles");
+        this.tileset = this.map.addTilesetImage("1bitplatformer", "monochrome_tilemap_sheet");
 
         // Create a layer
-        this.groundLayer = this.map.createLayer("Ground-n-Platforms", this.tileset, 0, 0);
+        this.wallsLayer = this.map.createLayer("walls", this.tileset, 0, 0);
 
         // Make it collidable
-        this.groundLayer.setCollisionByProperty({
+        this.wallsLayer.setCollisionByProperty({
             collides: true
         });
 
         // Create coins from Objects layer in tilemap
         this.coins = this.map.createFromObjects("Objects", {
             name: "coin",
-            key: "tilemap_sheet",
-            frame: 151
+            key: "monochrome_tilemap_sheet",
+            frame: 2
         });
 
         this.physics.world.enable(this.coins, Phaser.Physics.Arcade.STATIC_BODY);
